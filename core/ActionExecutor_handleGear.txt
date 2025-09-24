@@ -1,0 +1,63 @@
+    private void handleGear(int gearAction) {
+        if (gearAction == 0) {
+            return; // No gear switch
+        }
+
+        // gearAction == 1 means switch to tank gear
+        if (gearAction == 1) {
+            log.debug("[ACTION] Switching to tank gear");
+
+            // Get tank gear from bridge (this would come from loadout.getTankGear())
+            int[] tankGear = bridge.getTankGear();
+            if (tankGear == null || tankGear.length == 0) {
+                log.debug("[ACTION] No tank gear defined");
+                return;
+            }
+
+            // Find and equip each item from inventory
+            ItemContainer inventory = client.getItemContainer(InventoryID.INV);
+            if (inventory != null) {
+                Item[] items = inventory.getItems();
+
+                for (int gearId : tankGear) {
+                    // Find the item in inventory
+                    for (int i = 0; i < items.length; i++) {
+                        Item item = items[i];
+                        if (item != null && item.getId() == gearId) {
+                            // Create menu entry to equip the item
+                            int slot = i;
+                            Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
+                            if (inventoryWidget != null) {
+                                Widget[] children = inventoryWidget.getChildren();
+                                if (children != null && slot < children.length) {
+                                    Widget itemWidget = children[slot];
+                                    if (itemWidget != null) {
+                                        final int finalGearId = gearId; // Make final for lambda
+                                        MenuEntry menuEntry = client.getMenu().createMenuEntry(-1)
+                                            .setOption("Wear")
+                                            .setTarget("<col=ff9040>" + client.getItemDefinition(item.getId()).getName() + "</col>")
+                                            .setType(MenuAction.CC_OP)
+                                            .setIdentifier(9) // Wear action
+                                            .setParam0(slot)
+                                            .setParam1(WidgetInfo.INVENTORY.getId());
+                                        menuEntry.onClick(e -> log.debug("[ACTION] Equipped tank gear item: {}", finalGearId));
+                                        break; // Move to next gear item
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // After equipping tank gear, activate mage prayers if prayer points > 0
+                // This mirrors the Elvarg logic
+                if (client.getBoostedSkillLevel(Skill.PRAYER) > 0) {
+                    // Activate Augury (mage prayer) if available
+                    // Note: This would need to check player's prayer level
+                    log.debug("[ACTION] Would activate mage prayers after tank gear switch");
+                }
+            }
+        } else {
+            log.error("[ACTION] Invalid gear action: {}", gearAction);
+        }
+    }

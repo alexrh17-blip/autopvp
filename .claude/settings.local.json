@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/dev/naton/osrs-pvp-reinforcement-learning/pvp-ml/**)",
+      "Read(//c/dev/naton/osrs-pvp-reinforcement-learning/**)",
+      "Read(//c/Users/alexr/runelite/runelite-client/src/main/java/net/runelite/client/plugins/pvpbot/**)",
+      "Read(//c/Users/alexr/runelite/**)",
+      "Read(//c/dev/**)",
+      "Bash(unzip:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
